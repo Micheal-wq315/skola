@@ -79,12 +79,15 @@ export default function FlashView() {
     if (selectedChapter === null) return;
     const cards = chapterCards;
     const saved = progress[selectedChapter];
-    const cardStates = saved?.cards ?? cards.map(() => ({ level: 0, active: true }));
+    // 确保每个卡片都有状态，没有的用默认值
+    const cardStates = saved?.cards 
+      ? cards.map((_, i) => saved.cards[i] ?? { level: 0, active: true })
+      : cards.map(() => ({ level: 0, active: true }));
 
     const pool = cards
       .map((card, i) => ({ card, index: i, state: cardStates[i] }))
-      .filter((item) => item.state.active)
-      .sort((a, b) => a.state.level - b.state.level);
+      .filter((item) => item.state?.active ?? true)
+      .sort((a, b) => (a.state?.level ?? 0) - (b.state?.level ?? 0));
 
     const shuffled = shuffle(pool);
     setDeck(shuffled.map((item) => ({ card: item.card, index: item.index })));
@@ -114,7 +117,10 @@ export default function FlashView() {
 
     setTimeout(() => {
       const saved = progress[selectedChapter];
-      const cards = saved?.cards ?? chapterCards.map(() => ({ level: 0, active: true }));
+      // 确保每个卡片都有状态，没有的用默认值
+      const cards = saved?.cards 
+        ? chapterCards.map((_, i) => saved.cards[i] ?? { level: 0, active: true })
+        : chapterCards.map(() => ({ level: 0, active: true }));
 
       const upd = [...cards];
       const entry = upd[currentCard.index] ?? { level: 0, active: true };
