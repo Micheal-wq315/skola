@@ -140,9 +140,18 @@ export default function FlashView() {
 
       const nextIdx = cardIndex + 1;
       if (nextIdx >= deck!.length) {
-        initDeck();
-        if (deck!.length <= 1) {
+        const newDeck = shuffle(
+          cards
+            .map((card, i) => ({ card, index: i, state: upd[i] }))
+            .filter((item) => item.state?.active ?? true)
+        );
+        
+        if (newDeck.length === 0) {
+          setDeck([]);
           setFinished(true);
+        } else {
+          setDeck(newDeck.map((item) => ({ card: item.card, index: item.index })));
+          setCardIndex(0);
         }
       } else {
         setCardIndex(nextIdx);
