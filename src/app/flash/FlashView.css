@@ -238,6 +238,26 @@
 .flash-view__card-text--answer {
   font-size: 18px;
   color: var(--theme-primary-700);
+  text-align: left;
+  align-self: stretch;
+  white-space: pre-line;
+}
+
+.flash-view__card-text--answer::first-line {
+  font-weight: 800;
+  font-size: 20px;
+  color: var(--theme-primary-800);
+}
+
+.flash-view__card-extra {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px dashed var(--theme-primary-200);
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--theme-text-secondary);
+  text-align: left;
+  align-self: stretch;
 }
 
 .flash-view__actions {

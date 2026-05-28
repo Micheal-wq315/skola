@@ -12,6 +12,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { chapterNames, FD } from "../quiz/quizData";
 import "./FlashView.css";
 
 const BASE = "flash-view";
@@ -37,9 +38,28 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-import { chapterNames, FD } from "../quiz/quizData";
-
 const MASTERY_THRESHOLD = 3;
+
+function AnswerWithExtra({ content }: { content: string }) {
+  const parts = content.split("\n\n💡 补充知识：");
+  const answer = parts[0];
+  const extra = parts[1];
+
+  return (
+    <>
+      <div className={`${BASE}__card-text ${BASE}__card-text--answer`}>
+        {answer}
+      </div>
+      {extra && (
+        <div className={`${BASE}__card-extra`}>
+          💡 补充知识：
+          <br />
+          {extra}
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function FlashView() {
   const [progress, setProgress] = useLocalStorage<FlashProgress>("flash-progress", {});
@@ -309,9 +329,7 @@ export default function FlashView() {
                   className={`${BASE}__card ${BASE}__card--back`}
                 >
                   <div className={`${BASE}__card-label`}>答案</div>
-                  <div className={`${BASE}__card-text ${BASE}__card-text--answer`}>
-                    {currentCard.card.a}
-                  </div>
+                  <AnswerWithExtra content={currentCard.card.a} />
                 </Paper>
               </div>
             </div>
