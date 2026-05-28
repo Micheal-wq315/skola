@@ -1,0 +1,35 @@
+.note-editor-controls__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xs);
+  padding: 0 0 var(--spacing-sm) 0;
+  width: 100%;
+}
+
+.note-editor-controls__wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.note-editor-controls__wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.note-editor-controls__content-wrapper {
+  width: 100%;
+}
+
+.note-editor-controls__bubble-menu-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.note-editor-controls__bubble-menu-wrapper .note-editor-controls__wrapper {
+  padding: 0;
+}

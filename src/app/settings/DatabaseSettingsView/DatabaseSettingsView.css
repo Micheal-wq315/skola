@@ -1,0 +1,22 @@
+.database-settings-view__danger-zone h4 {
+  color: var(--theme-red-600);
+}
+
+.database-settings-view__danger-text {
+  font-size: var(--font-size-md);
+  margin: 0;
+}
+
+.database-settings-view__file-input-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.database-settings-view__file-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}

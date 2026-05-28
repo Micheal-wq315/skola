@@ -1,0 +1,249 @@
+{
+  "card": {
+    "menu": {
+      "debug": "Debug",
+      "edit": "Redigera",
+      "move": "Flytta"
+    }
+  },
+  "deck": {
+    "add-cards": "Lägg till kort",
+    "add-cards-tooltip": "Lägg till kort till denna kortlek",
+    "create-deck-tooltip": "Klicka här för att skapa en ny kortlek",
+    "learning-cards-label": "Plugga",
+    "learning-cards-label_one": "",
+    "learning-cards-label_other": "",
+    "menu": {
+      "debug": "Debug",
+      "delete": "Radera",
+      "import-cards": "Importera kort",
+      "manage-cards": "Hantera kort",
+      "move": "Flytta",
+      "options": "Alternativ",
+      "rename": "Döp om"
+    },
+    "new-cards-label": "Nya",
+    "new-cards-label_one": "Nytt",
+    "new-cards-label_other": "",
+    "new-deck-button": "",
+    "new-deck-modal": {
+      "description": "Beskrivning",
+      "name": "Namn",
+      "name-placeholder": "till exempel \"Spanska\", \"Anatomi\" eller \"Historik\"",
+      "new-subdeck": "Skapa nytt underdäck i {{superDeck}}",
+      "submit": "Skapa"
+    },
+    "notebook": {
+      "title": "Anteckningsbok"
+    },
+    "rename": {
+      "new-name": "",
+      "rename-button": "",
+      "title": ""
+    },
+    "review-cards-label": "Repetera",
+    "review-cards-label_one": "",
+    "review-cards-label_other": "",
+    "settings": "",
+    "subdeck": {
+      "add-subdeck-button": "",
+      "load-fail": "",
+      "title": ""
+    }
+  },
+  "global": {
+    "cancel": "Avbryt",
+    "feature-status": {
+      "in-development": " (Under utveckling)",
+      "new": " (Ny)",
+      "planned": " (Planerad)"
+    }
+  },
+  "hero-deck-section": {
+    "error": "",
+    "no-cards-title": ""
+  },
+  "home": {
+    "title": "Hem",
+    "welcome": "Välkommen!",
+    "welcome-user": "Välkommen tillbaka, {{name}}!"
+  },
+  "learning": {
+    "cognitive-prompts": {
+      "invert": {
+        "label": "Invertera",
+        "description": "Vad är motsatsen? Tänk om detta inte stämde?",
+        "placeholder": "Utforska inversionen eller negationen av detta koncept..."
+      },
+      "connect": {
+        "label": "Koppla",
+        "description": "Hur hänger detta ihop med något annat du vet?",
+        "placeholder": "Länka detta till ett annat koncept, område eller erfarenhet..."
+      },
+      "process": {
+        "label": "Process",
+        "description": "Vilka steg eller mekanismer är involverade?",
+        "placeholder": "Bryt ner processen eller förklara hur det fungerar..."
+      },
+      "analogy": {
+        "label": "Analogi",
+        "description": "Vad liknar detta? Skapa en jämförelse.",
+        "placeholder": "Detta är som... eftersom..."
+      },
+      "critique": {
+        "label": "Kritik",
+        "description": "Vilka är begränsningarna eller svagheterna?",
+        "placeholder": "Överväg specialfall, undantag eller motargument..."
+      },
+      "apply": {
+        "label": "Tillämpa",
+        "description": "Hur skulle du använda detta i praktiken?",
+        "placeholder": "Beskriv en verklig tillämpning eller ett exempel..."
+      }
+    },
+    "quick-add": {
+      "add-note": "Lägg till anteckning",
+      "cancel": "Avbryt"
+    },
+    "back-to-deck": "Tillbaka till kortleken",
+    "rate-again": "Igen",
+    "rate-hard": "Svårt",
+    "rate-good": "Bra",
+    "rate-easy": "Enkelt",
+    "finished-accuracy-ratio": "",
+    "finished-button-home": "",
+    "finished-button-to-deck": "",
+    "finished-congrats": "",
+    "finished-congrats-name": "",
+    "finished-duration": "",
+    "finished-info": "",
+    "finished-repetions-count": ""
+  },
+  "manage-cards": {
+    "title": "Hantera kort"
+  },
+  "note": {
+    "edit": {
+      "submit-button": "Spara kort",
+      "submit-button-tooltip": "Spara ändringar",
+      "title": "Redigera anteckning",
+      "type-specific": {
+        "double-sided": {
+          "back": "Baksida",
+          "front": "Framsida"
+        },
+        "normal": {
+          "back": "Baksida",
+          "front": "Framsida"
+        }
+      }
+    },
+    "menu": {
+      "edit": "Redigera",
+      "move": "Flytta"
+    },
+    "new": {
+      "select-note-type": {
+        "label": "Korttyp",
+        "tooltip": "Välj den typ av kort du vill skapa."
+      },
+      "submit-button": "Lägg till kort",
+      "submit-button-tooltip": "Lägg till kort",
+      "title": "Nya kort"
+    },
+    "type": {
+      "cloze": "Cloze",
+      "image-occlusion": "Bildocklusion",
+      "normal": "Vanligt",
+      "undefined": "Odefinierad"
+    },
+    "type-double-sided": "Dubbelsidig"
+  },
+  "settings": {
+    "about": {
+      "description": "",
+      "title": "Om Skola"
+    },
+    "appearance": {
+      "color-scheme": "Färgschema",
+      "color-scheme-auto": "Automatisk",
+      "color-scheme-dark": "Mörkt",
+      "color-scheme-description": "Välj mellan alltid ljust eller mörkt tema eller använd färgtemat för ditt system.",
+      "color-scheme-light": "Ljust",
+      "density": "Täthet",
+      "density-auto": "Auto",
+      "density-compact": "Kompakt",
+      "density-description": "Välj mellan avslappnat eller kompakt avstånd. Auto använder kompakt på skrivbord och avslappnat på pekenheter.",
+      "density-relaxed": "Avslappnat",
+      "title": "Utseende"
+    },
+    "database": {
+      "storage-used": "",
+      "title": "Databas"
+    },
+    "cloud": {
+      "title": "Molnsynkronisering"
+    },
+    "developer": {
+      "description": "använt",
+      "title": "Utvecklare"
+    },
+    "editing": {
+      "editor-options": "",
+      "individual-options": "",
+      "markdown-hint": "Du kan också använda kortkommandon och grundläggande markdown-syntax för att formatera text.",
+      "show-code-option": "",
+      "show-highlight-option": "",
+      "show-link-option": "",
+      "show-list-option": "",
+      "show-options-for-subscript-and-superscript": "",
+      "show-strikethrough-option": "",
+      "title": "Redigering",
+      "use-bubble-menu": "",
+      "use-toolbar": "",
+      "use-toolbar-description": ""
+    },
+    "editing-use-bubble-menu-description": "",
+    "general": {
+      "enable-developer-mode": "Aktivera utvecklarläge",
+      "enable-developer-mode-description": "Visa utvecklarverktyg för att inspektera webbsidor och aktivera utvecklarverktyg i appen.",
+      "enable-zen-mode": "",
+      "enable-zen-mode-description": "",
+      "language": "Språk",
+      "language-description": "Språk som används i gränssnittet.",
+      "name": "Namn",
+      "name-description": "This name will be used to customize the user experience.",
+      "show-shortcut-hints-description": "Möjliga kortkommandon kommer att visas i menyer etc.",
+      "title": "General"
+    },
+    "learn": {
+      "enable-visual-feedback": "Aktivera visuell feedback",
+      "enable-visual-feedback-description": "Visa en kort färgblixt efter att ha svarat på ett kort beroende på ditt betyg.",
+      "enableHardAndEasy": "Visa Svårt och Enkelt knappar",
+      "enableHardAndEasyDescription": "Visa knapparna Svårt och Enkelt vid inlärning. Om inaktiverad visas endast Igen och Bra.",
+      "show-cognitive-prompts": "Visa kognitiva uppmaningar",
+      "show-cognitive-prompts-description": "Visa tänkuppmaningar efter bemästrade kort för att uppmuntra djupare engagemang med materialet.",
+      "maximumInterval": "Maximalt intervall",
+      "maximumIntervalDescription": "Det maximala intervallet i dagar mellan två repetitioner av ett kort",
+      "requestRetention": "Begärd retention",
+      "requestRetentionDescription": "Ange vilken procentandel av frågorna du vill kunna komma ihåg på lång sikt.",
+      "newToReviewRatio": "Nya kort per repetition",
+      "newToReviewRatioDescription": "Detta bestämmer hur många nya kort som visas per repetition i genomsnitt.",
+      "title": "Lära"
+    },
+    "title": "Inställningar"
+  },
+  "sidebar": {
+    "decks-add": "",
+    "decks-title": ""
+  },
+  "spotlight": {
+    "no-results": "Inga resultater"
+  },
+  "statistics": {
+    "title": "Statistik"
+  },
+  "today": {
+    "title": "Idag"
+  }
+}

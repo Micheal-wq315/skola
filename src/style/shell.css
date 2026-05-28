@@ -1,0 +1,44 @@
+:root {
+  --app-header-base-height: 3.5rem;
+  --sidebar-base-width: 3.5rem;
+
+  --max-content-width: 40rem;
+
+  --app-header-height: var(--app-header-base-height);
+  --sidebar-width: var(--sidebar-base-width);
+
+  --density-compact: 0.85;
+}
+
+@media (max-width: 575.98px) {
+  :root {
+    --sidebar-width: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --sidebar-width: 15rem;
+  }
+}
+
+[data-density="compact"] {
+  --app-header-height: calc(
+    var(--app-header-base-height) *
+    var(--density-compact)
+  );
+
+  --sidebar-width: calc(var(--sidebar-base-width) * var(--density-compact));
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --sidebar-width: 15rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  :root {
+    --sidebar-width: 0;
+  }
+}

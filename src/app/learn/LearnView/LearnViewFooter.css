@@ -1,0 +1,25 @@
+.learn-view-footer {
+  position: relative;
+  z-index: 10;
+  background-color: var(--theme-neutral-50);
+  padding: var(--spacing-md);
+  border-top: solid 1px var(--theme-neutral-200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: calc(var(--spacing-md) + 0 * var(--safe-area-bottom));
+}
+
+.learn-view-footer__buttons {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  max-width: var(--content-width);
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .learn-view-footer__buttons {
+    gap: var(--spacing-sm);
+  }
+}
