@@ -13,7 +13,7 @@ const BASE = "quiz-view";
 
 interface QuizState {
   chapter: number;
-  answers: (number[] | null)[];
+  answers: (number[] | string | null)[];
   submitted: boolean;
   currentIndex: number;
 }
@@ -49,9 +49,11 @@ export default function QuizView() {
     if (!q) return;
 
     const newAnswers = [...quiz.answers];
-    const current = newAnswers[quiz.currentIndex];
 
-    if (q.type === "m") {
+    if (q.type === "f") {
+      newAnswers[quiz.currentIndex] = q.opts[optIndex]?.replace(/^[A-D]\.\s*/, "") || "";
+    } else if (q.type === "m") {
+      const current = newAnswers[quiz.currentIndex] as number[] | null;
       const arr = current ? [...current] : [];
       const idx = arr.indexOf(optIndex);
       if (idx >= 0) arr.splice(idx, 1);
@@ -65,8 +67,13 @@ export default function QuizView() {
 
   const isSelected = (optIndex: number): boolean => {
     if (!quiz) return false;
+    const q = C[quiz.chapter]?.q[quiz.currentIndex];
     const a = quiz.answers[quiz.currentIndex];
-    return a ? a.includes(optIndex) : false;
+    if (q?.type === "f") {
+      const optAnswer = q.opts[optIndex]?.replace(/^[A-D]\.\s*/, "") || "";
+      return a === optAnswer;
+    }
+    return Array.isArray(a) ? a.includes(optIndex) : false;
   };
 
   const goTo = (idx: number) => {
@@ -82,14 +89,17 @@ export default function QuizView() {
 
     let correct = 0;
     quiz.answers.forEach((ans, i) => {
-      if (!ans || ans.length === 0) return;
       const q = questions[i];
-      const right = Array.isArray(q.answer) ? q.answer : [q.answer];
-      if (
-        ans.length === right.length &&
-        ans.every((v) => right.includes(v))
-      ) {
-        correct++;
+      if (!ans || (Array.isArray(ans) && ans.length === 0) || (typeof ans === "string" && ans.trim() === "")) return;
+      if (q.type === "f") {
+        if (ans === q.answer) {
+          correct++;
+        }
+      } else {
+        const right = Array.isArray(q.answer) ? q.answer : [q.answer];
+        if (Array.isArray(ans) && ans.length === right.length && ans.every((v) => right.includes(v))) {
+          correct++;
+        }
       }
     });
 
@@ -108,7 +118,7 @@ export default function QuizView() {
 
   const getUnansweredCount = () => {
     if (!quiz) return 0;
-    return quiz.answers.filter((a) => !a || a.length === 0).length;
+    return quiz.answers.filter((a) => !a || (Array.isArray(a) && a.length === 0) || (typeof a === "string" && a.trim() === "")).length;
   };
 
   const getCorrectCount = () => {
@@ -117,26 +127,29 @@ export default function QuizView() {
     if (!questions) return 0;
     let c = 0;
     quiz.answers.forEach((ans, i) => {
-      if (!ans || ans.length === 0) return;
-      const right = Array.isArray(questions[i].answer)
-        ? questions[i].answer
-        : [questions[i].answer];
-      if (
-        ans.length === right.length &&
-        ans.every((v) => right.includes(v))
-      ) {
-        c++;
+      const q = questions[i];
+      if (!ans || (Array.isArray(ans) && ans.length === 0) || (typeof ans === "string" && ans.trim() === "")) return;
+      if (q.type === "f") {
+        if (ans === q.answer) {
+          c++;
+        }
+      } else {
+        const right = Array.isArray(q.answer) ? q.answer : [q.answer];
+        if (Array.isArray(ans) && ans.length === right.length && ans.every((v) => right.includes(v))) {
+          c++;
+        }
       }
     });
     return c;
   };
 
-  const isCorrect = (q: QuizQuestion, ans: number[] | null): boolean => {
-    if (!ans || ans.length === 0) return false;
+  const isCorrect = (q: QuizQuestion, ans: number[] | string | null): boolean => {
+    if (!ans || (Array.isArray(ans) && ans.length === 0) || (typeof ans === "string" && ans.trim() === "")) return false;
+    if (q.type === "f") {
+      return ans === q.answer;
+    }
     const right = Array.isArray(q.answer) ? q.answer : [q.answer];
-    return (
-      ans.length === right.length && ans.every((v) => right.includes(v))
-    );
+    return Array.isArray(ans) && ans.length === right.length && ans.every((v) => right.includes(v));
   };
 
   if (!selectedChapter) {
@@ -272,20 +285,32 @@ export default function QuizView() {
                     <span className={`${BASE}__result-label`}>
                       {correct ? "✓ 回答正确" : "✗ 你的答案：无"}
                     </span>
-                    {!correct && quiz?.answers[i] && quiz.answers[i]!.length > 0 && (
-                      <span className={`${BASE}__result-label`}>
-                        ✗ 你的答案：
-                        {quiz.answers[i]!
-                          .map((oi) => question.opts[oi] ?? `选项${oi+1}`)
-                          .join("、")}
-                      </span>
+                    {!correct && quiz?.answers[i] && (
+                      question.type === "f" ? (
+                        <span className={`${BASE}__result-label`}>
+                          ✗ 你的答案：{quiz.answers[i]}
+                        </span>
+                      ) : (
+                        Array.isArray(quiz.answers[i]) && quiz.answers[i].length > 0 && (
+                          <span className={`${BASE}__result-label`}>
+                            ✗ 你的答案：
+                            {quiz.answers[i]
+                              .map((oi) => question.opts[oi] ?? `选项${oi+1}`)
+                              .join("、")}
+                          </span>
+                        )
+                      )
                     )}
                     <span className={`${BASE}__result-correct`}>
                       正确答案：
-                      {(Array.isArray(question.answer)
-                        ? question.answer.map((ai) => question.opts[ai] ?? `选项${ai+1}`)
-                        : [question.opts[question.answer] ?? `选项${question.answer+1}`]
-                      ).join("、")}
+                      {question.type === "f" ? (
+                        question.answer
+                      ) : (
+                        (Array.isArray(question.answer)
+                          ? question.answer.map((ai) => question.opts[ai] ?? `选项${ai+1}`)
+                          : [question.opts[question.answer] ?? `选项${question.answer+1}`]
+                        ).join("、")
+                      )}
                     </span>
                   </div>
                   {question.hint && (
@@ -344,7 +369,7 @@ export default function QuizView() {
         {q && (
           <Paper withBorder className={`${BASE}__question-card`}>
             <div className={`${BASE}__question-meta`}>
-              {q.type === "m" ? "多选题" : "单选题"} · 第{(quiz?.currentIndex ?? 0) + 1}题
+              {q.type === "m" ? "多选题" : q.type === "f" ? "填空题" : "单选题"} · 第{(quiz?.currentIndex ?? 0) + 1}题
             </div>
             <div className={`${BASE}__question-text`}>{q.text}</div>
             <div className={`${BASE}__options`}>

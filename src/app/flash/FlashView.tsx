@@ -40,33 +40,13 @@ function shuffle<T>(arr: T[]): T[] {
 
 const MASTERY_THRESHOLD = 3;
 
-function AnswerWithExtra({ content }: { content: string }) {
-  const parts = content.split("\n\n💡 补充知识：");
-  const answer = parts[0];
-  const extra = parts[1];
-
-  return (
-    <>
-      <div className={`${BASE}__card-text ${BASE}__card-text--answer`}>
-        {answer}
-      </div>
-      {extra && (
-        <div className={`${BASE}__card-extra`}>
-          💡 补充知识：
-          <br />
-          {extra}
-        </div>
-      )}
-    </>
-  );
-}
-
 export default function FlashView() {
   const [progress, setProgress] = useLocalStorage<FlashProgress>("flash-progress", {});
   const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
   const [deck, setDeck] = useState<{ card: typeof FD[0]; index: number }[] | null>(null);
   const [cardIndex, setCardIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [showAnswer, setShowAnswer] = useState(false);
   const [animOut, setAnimOut] = useState<"yes" | "no" | null>(null);
   const [finished, setFinished] = useState(false);
 
@@ -79,7 +59,6 @@ export default function FlashView() {
     if (selectedChapter === null) return;
     const cards = chapterCards;
     const saved = progress[selectedChapter];
-    // 确保每个卡片都有状态，没有的用默认值
     const cardStates = saved?.cards 
       ? cards.map((_, i) => saved.cards[i] ?? { level: 0, active: true })
       : cards.map(() => ({ level: 0, active: true }));
@@ -92,7 +71,8 @@ export default function FlashView() {
     const shuffled = shuffle(pool);
     setDeck(shuffled.map((item) => ({ card: item.card, index: item.index })));
     setCardIndex(0);
-    setFlipped(false);
+    setSelectedOption(null);
+    setShowAnswer(false);
     setAnimOut(null);
     setFinished(false);
   }, [selectedChapter, chapterCards, progress]);
@@ -105,9 +85,10 @@ export default function FlashView() {
 
   const currentCard = deck && cardIndex < deck.length ? deck[cardIndex] : null;
 
-  const flipCard = () => {
-    if (animOut || finished) return;
-    setFlipped(true);
+  const selectOption = (optIndex: number) => {
+    if (showAnswer || animOut || finished) return;
+    setSelectedOption(optIndex);
+    setShowAnswer(true);
   };
 
   const answerCard = (known: boolean) => {
@@ -117,7 +98,6 @@ export default function FlashView() {
 
     setTimeout(() => {
       const saved = progress[selectedChapter];
-      // 确保每个卡片都有状态，没有的用默认值
       const cards = saved?.cards 
         ? chapterCards.map((_, i) => saved.cards[i] ?? { level: 0, active: true })
         : chapterCards.map(() => ({ level: 0, active: true }));
@@ -135,7 +115,8 @@ export default function FlashView() {
       };
       setProgress(newProgress);
 
-      setFlipped(false);
+      setSelectedOption(null);
+      setShowAnswer(false);
       setAnimOut(null);
 
       const nextIdx = cardIndex + 1;
@@ -163,7 +144,8 @@ export default function FlashView() {
     setSelectedChapter(null);
     setDeck(null);
     setCardIndex(0);
-    setFlipped(false);
+    setSelectedOption(null);
+    setShowAnswer(false);
     setAnimOut(null);
     setFinished(false);
   };
@@ -181,7 +163,8 @@ export default function FlashView() {
     );
     setDeck(pool);
     setCardIndex(0);
-    setFlipped(false);
+    setSelectedOption(null);
+    setShowAnswer(false);
     setAnimOut(null);
     setFinished(false);
   };
@@ -197,7 +180,7 @@ export default function FlashView() {
             <IconCards size={40} className={`${BASE}__hero-icon`} />
             <h1 className={`${BASE}__title`}>知识点速记</h1>
             <p className={`${BASE}__subtitle`}>
-              翻转卡片记忆 · 每张卡片需连续答对 {MASTERY_THRESHOLD} 次方可掌握
+              选择题形式记忆 · 每张卡片需连续答对 {MASTERY_THRESHOLD} 次方可掌握
             </p>
           </div>
           <div className={`${BASE}__chapter-list`}>
@@ -327,54 +310,87 @@ export default function FlashView() {
               第 {cardIndex + 1}/{remainingInDeck} 张
             </div>
             <div
-              className={`${BASE}__card-wrap ${flipped ? `${BASE}__card-wrap--flipped` : ""} ${animOut ? `${BASE}__card-wrap--exit-${animOut}` : ""}`}
+              className={`${BASE}__card-wrap ${animOut ? `${BASE}__card-wrap--exit-${animOut}` : ""}`}
             >
-              <div className={`${BASE}__card-inner`}>
-                <Paper
-                  withBorder
-                  withTexture
-                  className={`${BASE}__card ${BASE}__card--front`}
-                  onClick={flipCard}
-                >
-                  <div className={`${BASE}__card-label`}>点击翻转查看答案</div>
-                  <div className={`${BASE}__card-text`}>{currentCard.card.q}</div>
-                </Paper>
-                <Paper
-                  withBorder
-                  className={`${BASE}__card ${BASE}__card--back`}
-                >
-                  <div className={`${BASE}__card-label`}>答案</div>
-                  <AnswerWithExtra content={currentCard.card.a} />
-                </Paper>
-              </div>
+              <Paper
+                withBorder
+                className={`${BASE}__card`}
+              >
+                <div className={`${BASE}__card-label`}>问题</div>
+                <div className={`${BASE}__card-text`}>{currentCard.card.q}</div>
+                
+                <div className={`${BASE}__options`}>
+                  {currentCard.card.opts.map((opt, oi) => {
+                    let optionClass = `${BASE}__option`;
+                    if (showAnswer) {
+                      if (oi === currentCard.card.answer) {
+                        optionClass += ` ${BASE}__option--correct`;
+                      } else if (oi === selectedOption && oi !== currentCard.card.answer) {
+                        optionClass += ` ${BASE}__option--wrong`;
+                      }
+                    } else if (selectedOption === oi) {
+                      optionClass += ` ${BASE}__option--selected`;
+                    }
+                    
+                    return (
+                      <button
+                        key={oi}
+                        type="button"
+                        className={optionClass}
+                        onClick={() => selectOption(oi)}
+                        disabled={showAnswer || !!animOut}
+                      >
+                        <span className={`${BASE}__option-letter`}>
+                          {String.fromCharCode(65 + oi)}
+                        </span>
+                        <span className={`${BASE}__option-text`}>{opt}</span>
+                        {showAnswer && oi === currentCard.card.answer && <IconCheck size={16} />}
+                        {showAnswer && oi === selectedOption && oi !== currentCard.card.answer && <IconX size={16} />}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {showAnswer && (
+                  <div className={`${BASE}__hint-container`}>
+                    <div className={`${BASE}__hint`}>
+                      💡 {currentCard.card.hint}
+                    </div>
+                  </div>
+                )}
+              </Paper>
             </div>
           </div>
         )}
 
-        <div className={`${BASE}__actions`}>
-          <button
-            type="button"
-            className={`${BASE}__btn ${BASE}__btn--no`}
-            onClick={() => answerCard(false)}
-            disabled={!flipped || !!animOut}
-          >
-            <IconX size={22} />
-            <span>没记住</span>
-          </button>
-          <button
-            type="button"
-            className={`${BASE}__btn ${BASE}__btn--yes`}
-            onClick={() => answerCard(true)}
-            disabled={!flipped || !!animOut}
-          >
-            <IconCheck size={22} />
-            <span>记住了</span>
-          </button>
-        </div>
+        {showAnswer && (
+          <div className={`${BASE}__actions`}>
+            <button
+              type="button"
+              className={`${BASE}__btn ${BASE}__btn--no`}
+              onClick={() => answerCard(false)}
+              disabled={!!animOut}
+            >
+              <IconX size={22} />
+              <span>没记住</span>
+            </button>
+            <button
+              type="button"
+              className={`${BASE}__btn ${BASE}__btn--yes`}
+              onClick={() => answerCard(true)}
+              disabled={!!animOut}
+            >
+              <IconCheck size={22} />
+              <span>记住了</span>
+            </button>
+          </div>
+        )}
 
-        <div className={`${BASE}__hint`}>
-          点击卡片翻转 · 翻转后选择掌握程度 · 连续答对 {MASTERY_THRESHOLD} 次即可掌握
-        </div>
+        {!showAnswer && (
+          <div className={`${BASE}__hint-text`}>
+            请选择你认为正确的答案
+          </div>
+        )}
       </div>
     </>
   );
