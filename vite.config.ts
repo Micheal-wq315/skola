@@ -9,7 +9,7 @@ import viteTsconfigPaths from "vite-tsconfig-paths";
 const pkg = JSON.parse(fs.readFileSync("./package.json", "utf-8"));
 
 export default defineConfig({
-  base: "/",
+  base: process.env.BASE_PATH || "/skola/",
   css: {
     modules: {},
   },
