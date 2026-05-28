@@ -276,15 +276,15 @@ export default function QuizView() {
                       <span className={`${BASE}__result-label`}>
                         ✗ 你的答案：
                         {quiz.answers[i]!
-                          .map((oi) => question.opts[oi])
+                          .map((oi) => question.opts[oi] ?? `选项${oi+1}`)
                           .join("、")}
                       </span>
                     )}
                     <span className={`${BASE}__result-correct`}>
                       正确答案：
                       {(Array.isArray(question.answer)
-                        ? question.answer.map((ai) => question.opts[ai])
-                        : [question.opts[question.answer]]
+                        ? question.answer.map((ai) => question.opts[ai] ?? `选项${ai+1}`)
+                        : [question.opts[question.answer] ?? `选项${question.answer+1}`]
                       ).join("、")}
                     </span>
                   </div>
