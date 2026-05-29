@@ -11,7 +11,7 @@ import {
   IconReload,
   IconX,
 } from "@tabler/icons-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { chapterNames, FD } from "../quiz/quizData";
 import "./FlashView.css";
 
@@ -29,6 +29,11 @@ interface ChapterState {
 
 type FlashProgress = Record<number, ChapterState>;
 
+interface DeckItem {
+  card: typeof FD[0];
+  index: number;
+}
+
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -43,12 +48,32 @@ const MASTERY_THRESHOLD = 3;
 export default function FlashView() {
   const [progress, setProgress] = useLocalStorage<FlashProgress>("flash-progress", {});
   const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
-  const [deck, setDeck] = useState<{ card: typeof FD[0]; index: number }[] | null>(null);
+  const [deck, setDeck] = useState<DeckItem[] | null>(null);
   const [cardIndex, setCardIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [animOut, setAnimOut] = useState<"yes" | "no" | null>(null);
   const [finished, setFinished] = useState(false);
+
+  const deckRef = useRef<DeckItem[] | null>(null);
+  const cardIndexRef = useRef(0);
+  const processingRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    deckRef.current = deck;
+  }, [deck]);
+
+  useEffect(() => {
+    cardIndexRef.current = cardIndex;
+  }, [cardIndex]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const chapterCards = useMemo(() => {
     if (selectedChapter === null) return [];
@@ -69,12 +94,16 @@ export default function FlashView() {
       .sort((a, b) => (a.state?.level ?? 0) - (b.state?.level ?? 0));
 
     const shuffled = shuffle(pool);
-    setDeck(shuffled.map((item) => ({ card: item.card, index: item.index })));
+    const newDeck = shuffled.map((item) => ({ card: item.card, index: item.index }));
+    setDeck(newDeck);
+    deckRef.current = newDeck;
     setCardIndex(0);
+    cardIndexRef.current = 0;
     setSelectedOption(null);
     setShowAnswer(false);
     setAnimOut(null);
     setFinished(false);
+    processingRef.current = false;
   }, [selectedChapter, chapterCards, progress]);
 
   useEffect(() => {
@@ -92,58 +121,85 @@ export default function FlashView() {
   };
 
   const answerCard = (known: boolean) => {
-    if (!currentCard || animOut || !selectedChapter) return;
+    const d = deckRef.current;
+    const idx = cardIndexRef.current;
+    const ch = selectedChapter;
+    if (animOut || processingRef.current || !d || idx >= d.length || !ch) return;
+
+    processingRef.current = true;
     const dir = known ? "yes" : "no";
     setAnimOut(dir);
 
     setTimeout(() => {
-      const saved = progress[selectedChapter];
+      if (!mountedRef.current) {
+        processingRef.current = false;
+        return;
+      }
+
+      const currentDeck = deckRef.current;
+      const currentIdx = cardIndexRef.current;
+      if (!currentDeck || currentIdx >= currentDeck.length) {
+        setAnimOut(null);
+        processingRef.current = false;
+        return;
+      }
+
+      const cardItem = currentDeck[currentIdx];
+      const saved = progress[ch];
       const cards = saved?.cards 
         ? chapterCards.map((_, i) => saved.cards[i] ?? { level: 0, active: true })
         : chapterCards.map(() => ({ level: 0, active: true }));
 
       const upd = [...cards];
-      const entry = upd[currentCard.index] ?? { level: 0, active: true };
+      const entry = upd[cardItem.index] ?? { level: 0, active: true };
       const newLevel = known ? entry.level + 1 : Math.max(0, entry.level - 1);
       const active = newLevel < MASTERY_THRESHOLD;
-      upd[currentCard.index] = { level: newLevel, active };
+      upd[cardItem.index] = { level: newLevel, active };
 
       const mastered = upd.filter((c) => !c.active).length;
-      const newProgress = {
-        ...progress,
-        [selectedChapter]: { d: mastered, cards: upd },
-      };
-      setProgress(newProgress);
+      setProgress((prev) => ({
+        ...prev,
+        [ch]: { d: mastered, cards: upd },
+      }));
 
-      setSelectedOption(null);
-      setShowAnswer(false);
-      setAnimOut(null);
-
-      const nextIdx = cardIndex + 1;
-      if (nextIdx >= deck!.length) {
+      const nextIdx = currentIdx + 1;
+      if (nextIdx >= currentDeck.length) {
         const newDeck = shuffle(
           cards
             .map((card, i) => ({ card, index: i, state: upd[i] }))
             .filter((item) => item.state?.active ?? true)
+            .map((item) => ({ card: item.card, index: item.index }))
         );
-        
+
         if (newDeck.length === 0) {
           setDeck([]);
+          deckRef.current = [];
           setFinished(true);
         } else {
-          setDeck(newDeck.map((item) => ({ card: item.card, index: item.index })));
+          setDeck(newDeck);
+          deckRef.current = newDeck;
           setCardIndex(0);
+          cardIndexRef.current = 0;
         }
       } else {
         setCardIndex(nextIdx);
+        cardIndexRef.current = nextIdx;
       }
-    }, 350);
+
+      setSelectedOption(null);
+      setShowAnswer(false);
+      setAnimOut(null);
+      processingRef.current = false;
+    }, 300);
   };
 
   const backToList = () => {
+    processingRef.current = false;
     setSelectedChapter(null);
     setDeck(null);
+    deckRef.current = null;
     setCardIndex(0);
+    cardIndexRef.current = 0;
     setSelectedOption(null);
     setShowAnswer(false);
     setAnimOut(null);
@@ -152,17 +208,19 @@ export default function FlashView() {
 
   const restartChapter = () => {
     if (!selectedChapter) return;
+    processingRef.current = false;
     const cards = chapterCards.map(() => ({ level: 0, active: true }));
-    const newProgress = {
-      ...progress,
+    setProgress((prev) => ({
+      ...prev,
       [selectedChapter]: { d: 0, cards },
-    };
-    setProgress(newProgress);
+    }));
     const pool = shuffle(
       chapterCards.map((card, i) => ({ card, index: i }))
     );
     setDeck(pool);
+    deckRef.current = pool;
     setCardIndex(0);
+    cardIndexRef.current = 0;
     setSelectedOption(null);
     setShowAnswer(false);
     setAnimOut(null);
@@ -318,7 +376,7 @@ export default function FlashView() {
               >
                 <div className={`${BASE}__card-label`}>问题</div>
                 <div className={`${BASE}__card-text`}>{currentCard.card.q}</div>
-                
+
                 <div className={`${BASE}__options`}>
                   {currentCard.card.opts.map((opt, oi) => {
                     let optionClass = `${BASE}__option`;
@@ -331,7 +389,7 @@ export default function FlashView() {
                     } else if (selectedOption === oi) {
                       optionClass += ` ${BASE}__option--selected`;
                     }
-                    
+
                     return (
                       <button
                         key={oi}
