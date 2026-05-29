@@ -54,6 +54,7 @@ export default function FlashView() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [animOut, setAnimOut] = useState<"yes" | "no" | null>(null);
   const [finished, setFinished] = useState(false);
+  const [transitionKey, setTransitionKey] = useState(0);
 
   const deckRef = useRef<DeckItem[] | null>(null);
   const cardIndexRef = useRef(0);
@@ -101,6 +102,7 @@ export default function FlashView() {
     cardIndexRef.current = 0;
     setSelectedOption(null);
     setShowAnswer(false);
+    setTransitionKey((prev) => prev + 1);
     setAnimOut(null);
     setFinished(false);
     processingRef.current = false;
@@ -186,6 +188,7 @@ export default function FlashView() {
         cardIndexRef.current = nextIdx;
       }
 
+      setTransitionKey((prev) => prev + 1);
       setSelectedOption(null);
       setShowAnswer(false);
       setAnimOut(null);
@@ -195,6 +198,7 @@ export default function FlashView() {
 
   const backToList = () => {
     processingRef.current = false;
+    setTransitionKey((prev) => prev + 1);
     setSelectedChapter(null);
     setDeck(null);
     deckRef.current = null;
@@ -209,6 +213,7 @@ export default function FlashView() {
   const restartChapter = () => {
     if (!selectedChapter) return;
     processingRef.current = false;
+    setTransitionKey((prev) => prev + 1);
     const cards = chapterCards.map(() => ({ level: 0, active: true }));
     setProgress((prev) => ({
       ...prev,
@@ -363,7 +368,7 @@ export default function FlashView() {
         </div>
 
         {currentCard && (
-          <div className={`${BASE}__card-stage`}>
+          <div className={`${BASE}__card-stage`} key={`card-${cardIndex}-t${transitionKey}`}>
             <div className={`${BASE}__card-counter`}>
               第 {cardIndex + 1}/{remainingInDeck} 张
             </div>
